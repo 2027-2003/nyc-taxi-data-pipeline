@@ -1,0 +1,12 @@
+my_dbt_project:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      user: postgres
+      password: '12345'  # خله نص (بين علامات تنصيص)
+      port: 1234         # خله رقم (بدون علامات تنصيص)
+      dbname: ai_data_platform
+      schema: public
+      threads: 1
