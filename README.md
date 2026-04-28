@@ -142,7 +142,7 @@ The `dashboard/` module provides real-time visualization of:
 
 ## 👤 Contact
 
-**Mishal Ahmed**
+**Meshal Ahmed**
 Information Systems Student | Data Engineering Enthusiast
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/meshal-ahmed-4a84242b5)
