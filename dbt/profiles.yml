@@ -5,8 +5,8 @@ my_dbt_project:
       type: postgres
       host: localhost
       user: postgres
-      password: '12345'  # خله نص (بين علامات تنصيص)
-      port: 1234         # خله رقم (بدون علامات تنصيص)
-      dbname: ai_data_platform
+      password: '1234'
+      port: 5432
+      dbname: nyc_taxi
       schema: public
       threads: 1

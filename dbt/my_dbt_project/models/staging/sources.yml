@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: nyc_taxi
+    database: nyc_taxi
+    schema: public
+    tables:
+      - name: taxi_trips

@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: stg_taxi_trips
+    description: NYC Taxi trips data after cleaning
+    columns:
+      - name: vendor_id
+        tests:
+          - not_null
+      - name: total_amount
+        tests:
+          - not_null
+      - name: trip_distance
+        tests:
+          - not_null
+      - name: pickup_hour
+        tests:
+          - not_null
+          
