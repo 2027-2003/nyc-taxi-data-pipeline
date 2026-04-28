@@ -1,32 +1,45 @@
 import pandas as pd
-import psycopg2
+from sqlalchemy import create_engine
 import os
 
-base_path = os.path.dirname(os.path.dirname(__file__))
-
-processed_path = os.path.join(base_path, "data_lake", "processed", "processed_data.csv")
-
-df = pd.read_csv(processed_path)
-
-conn = psycopg2.connect(
-    host="localhost",
-    port="1234",        # ✅ مهم جدًا
-    database="ai_data_platform",
-    user="postgres",
-    password="12345"    # ✅ الباسورد الصح
-)
-
-cursor = conn.cursor()
-
-for index, row in df.iterrows():
-    cursor.execute(
-        "INSERT INTO posts (userid, id, title) VALUES (%s, %s, %s)",
-        (row["userId"], row["id"], row["title"])
+def load_to_warehouse():
+    engine = create_engine(
+        "postgresql://postgres:1234@localhost:5432/nyc_taxi"
     )
 
-conn.commit()
+    base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = os.path.join(base_path, "data_lake", "curated", "transformed_data.parquet")
 
-cursor.close()
-conn.close()
+    print("📂 جاري تحميل البيانات...")
+    df = pd.read_parquet(path)
 
-print("Data loaded into warehouse successfully")
+    df = df.rename(columns={
+        "VendorID": "vendor_id",
+        "tpep_pickup_datetime": "pickup_datetime",
+        "tpep_dropoff_datetime": "dropoff_datetime",
+        "RatecodeID": "ratecode_id",
+        "PULocationID": "pu_location_id",
+        "DOLocationID": "do_location_id",
+    })
+
+    print(f"📤 جاري رفع {len(df):,} صف...")
+
+    # نرفع على دفعات يدوياً
+    batch_size = 50000
+    total = len(df)
+    
+    with engine.connect() as conn:
+        # نحذف الجدول القديم ونبني جديد
+        df.head(0).to_sql("taxi_trips", conn, if_exists="replace", index=False)
+        conn.commit()
+        
+        for i in range(0, total, batch_size):
+            batch = df.iloc[i:i+batch_size]
+            batch.to_sql("taxi_trips", conn, if_exists="append", index=False)
+            conn.commit()
+            print(f"✅ تم رفع {min(i+batch_size, total):,} من {total:,}")
+
+    print("🎉 اكتمل الرفع بنجاح!")
+
+if __name__ == "__main__":
+    load_to_warehouse()
